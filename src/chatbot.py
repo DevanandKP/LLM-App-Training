@@ -1,19 +1,27 @@
 import os
+
 from openai import OpenAI
 from dotenv import load_dotenv
 from llama_api_client import LlamaAPIClient
 
+from utils.file import load_configs
+
 def make_llm_call(query):
     try:
         load_dotenv()
+        settings = load_configs('config/llm_settings.yaml')
+
         client = OpenAI(base_url='https://api.ai-gateway.tigeranalytics.com',
                         api_key= os.getenv("OPENAI_API_KEY"))
         
-        response = client.responses.create(
-            model="llama-3.2-1b-instruct",
-            input=query
+        response = client.chat.completions.create(
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant that provides concise answers."},
+                {"role": "user", "content": f"{query}"}
+            ],
+            **settings
         )
-        print(response.output_text)
+        print(response.choices[0].message.content)
     except Exception:
         raise
     
