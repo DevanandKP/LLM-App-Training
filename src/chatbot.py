@@ -19,9 +19,13 @@ def make_llm_call(query):
                 {"role": "system", "content": "You are a helpful assistant that provides concise answers."},
                 {"role": "user", "content": f"{query}"}
             ],
+            stream = True,
             **settings
         )
-        print(response.choices[0].message.content)
+        # print(response.choices[0].message.content)
+        for chunk in response:
+            if chunk.choices[0].delta.content is not None:
+                print(chunk.choices[0].delta.content, end="")
     except Exception:
         raise
     
